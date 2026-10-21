@@ -1,0 +1,10 @@
+---
+title: Remove Xbox by GlendaOS
+description: This task removes Xbox services and apps from the system.
+actions:
+  - !writeStatus: {status: 'Remove Xbox services and apps ...', option: 'remove-xbox'}
+  - !run: 
+      exe: 'remove-xbox.bat'
+      exeDir: true
+      wait: true
+      option: 'remove-xbox'
