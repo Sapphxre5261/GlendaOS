@@ -1,17 +1,9 @@
 title: Main
 actions:
-  - !task: {path: 'tasks\backup.yml'}
   - !task: {path: 'tasks\registry.yml'}
   - !task: {path: 'tasks\appx.yml'}
   - !task: {path: 'tasks\services.yml'}
   - !task: {path: 'tasks\components.yml'}
-  - !task: {path: 'tasks\defender.yml'}
   - !task: {path: 'tasks\files.yml'}
   - !task: {path: 'tasks\ui.yml'}
-  - !task: {path: 'tasks\win_update.yml'}
-  - !task: {path: 'tasks\xbox.yml'}
-  - !task: {path: 'tasks\wallpaper.yml'}
-  - !task: {path: 'tasks\gaming.yml'}
-  - !task: {path: 'tasks\animation.yml'}
-  - !task: {path: 'tasks\browser.yml'}
-  
+  - !task: {path: 'tasks\software.yml'}

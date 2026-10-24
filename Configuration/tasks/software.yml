@@ -1,0 +1,18 @@
+title: Software
+description: Installs software
+actions:
+  - !status: {status: 'Installing OnlyOffice', option: "office-onlyoffice"}
+  - !software:
+    name: "onlyoffice"
+    source: chocolatey
+    option: "office-onlyoffice"
+  - !status: {status: 'Installing FreeOffice', option: "office-freeoffice"}
+  - !software:
+    name: "freeoffice"
+    source: chocolatey
+    option: "office-freeoffice"
+  - !status: {status: 'Installing LibreOffice', option: "office-libreoffice"}
+  - !software:
+    name: "libreoffice"
+    source: chocolatey
+    option: "office-libreoffice"

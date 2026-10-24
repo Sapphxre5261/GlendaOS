@@ -1,8 +1,0 @@
-title: Browser
-description: Installs Brave browser
-actions:
-  - !writeStatus: {status: 'Installing Brave browser'}
-
-  - !software:
-    name: "brave"
-    source: chocolatey

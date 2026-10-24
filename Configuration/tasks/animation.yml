@@ -1,9 +1,0 @@
----
-title: Disable Animation
-description: This task disables animations and transparency effects.
-actions:
-  - !writeStatus: {status: 'Disable animations and transparency effects ...'}
-  - !run: 
-      exe: 'disable-animation.bat'
-      exeDir: true
-      wait: true

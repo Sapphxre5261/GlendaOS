@@ -18,15 +18,5 @@ actions:
     exeDir: true
     exe: "CLEANUP.bat"
     weight: 30
-
-  # Clear pinned taskbar items - removed apps (Edge/Store) leave dead ghost icons
-  # Explorer is already stopped above; the Taskband key + pinned folder are wiped and
-  # rebuilt clean when explorer restarts below
-  - !powerShell:
-    command: |
-      Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" -Recurse -Force -ErrorAction SilentlyContinue
-      Remove-Item "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar" -Recurse -Force -ErrorAction SilentlyContinue
-    runas: currentUser
-    wait: true
-
+    
   - !run: {exe: "explorer.exe", wait: false, runas: currentUser}
