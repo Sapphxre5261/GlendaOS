@@ -1,0 +1,79 @@
+# Handles registry writes that !registryValue/!service can't do on newer builds
+# because the keys are ACL-protected (deny write even for SYSTEM).
+# Takes ownership via SeTakeOwnershipPrivilege, grants SYSTEM full control, then writes.
+
+param(
+    [switch]$Services,
+    [switch]$Policies
+)
+
+$privCode = @'
+using System;
+using System.Runtime.InteropServices;
+public class TokenPrivileges {
+    [DllImport("advapi32.dll", SetLastError = true)]
+    static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    static extern bool LookupPrivilegeValue(string lpSystemName, string lpName, out long lpLuid);
+    [DllImport("advapi32.dll", SetLastError = true)]
+    static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TOKEN_PRIVILEGES NewState, int BufferLength, IntPtr PreviousState, IntPtr ReturnLength);
+    [StructLayout(LayoutKind.Sequential)]
+    struct TOKEN_PRIVILEGES { public int PrivilegeCount; public long Luid; public int Attributes; }
+    public static void Enable(string name) {
+        IntPtr h;
+        OpenProcessToken(System.Diagnostics.Process.GetCurrentProcess().Handle, 0x28, out h);
+        TOKEN_PRIVILEGES tp = new TOKEN_PRIVILEGES { PrivilegeCount = 1, Attributes = 2 };
+        LookupPrivilegeValue(null, name, out tp.Luid);
+        AdjustTokenPrivileges(h, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero);
+    }
+}
+'@
+Add-Type $privCode
+'SeTakeOwnershipPrivilege','SeRestorePrivilege','SeBackupPrivilege' | ForEach-Object { [TokenPrivileges]::Enable($_) }
+
+$adminSid  = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-544'
+$systemSid = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-18'
+
+function Grant-RegKey([string]$Path) {
+    $acl = Get-Acl $Path
+    $acl.SetOwner($adminSid)
+    Set-Acl -Path $Path -AclObject $acl -ErrorAction Stop
+    $acl = Get-Acl $Path
+    $rule = New-Object System.Security.AccessControl.RegistryAccessRule($systemSid, 'FullControl', 'ContainerInherit', 'None', 'Allow')
+    $acl.SetAccessRule($rule)
+    Set-Acl -Path $Path -AclObject $acl -ErrorAction Stop
+}
+
+# Defender services - SCM-based changes are denied, write Start=4 directly
+if ($Services) {
+    foreach ($s in 'WinDefend','WdNisSvc','Sense','SecurityHealthService','WdNisDrv','WdFilter','WdBoot') {
+        $k = "HKLM:\SYSTEM\CurrentControlSet\Services\$s"
+        if (!(Test-Path $k)) { Write-Host "$s : not present, skipping"; continue }
+        try {
+            Grant-RegKey $k
+            Set-ItemProperty -Path $k -Name 'Start' -Value 4 -Type DWord -ErrorAction Stop
+            Set-ItemProperty -Path $k -Name 'AutorunsDisabled' -Value 3 -Type DWord -ErrorAction SilentlyContinue
+            Write-Host "$s : disabled"
+        } catch {
+            Write-Host "$s : FAILED - $($_.Exception.Message)"
+        }
+    }
+}
+
+# ACL-protected policy keys
+if ($Policies) {
+    $targets = @(
+        @{ Path = 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh'; Name = 'AllowNewsAndInterests' },
+        @{ Path = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds'; Name = 'EnableFeeds' }
+    )
+    foreach ($t in $targets) {
+        try {
+            if (!(Test-Path $t.Path)) { New-Item $t.Path -Force | Out-Null }
+            Grant-RegKey $t.Path
+            New-ItemProperty -Path $t.Path -Name $t.Name -PropertyType DWord -Value 0 -Force -ErrorAction Stop | Out-Null
+            Write-Host "$($t.Path)\$($t.Name) : set to 0"
+        } catch {
+            Write-Host "$($t.Path) : FAILED - $($_.Exception.Message)"
+        }
+    }
+}

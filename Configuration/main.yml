@@ -5,6 +5,7 @@ actions:
   - !task: {path: 'tasks\services.yml'}
   - !task: {path: 'tasks\components.yml'}
   - !task: {path: 'tasks\files.yml'}
+  - !task: {path: 'tasks\defender.yml'}
   - !task: {path: 'tasks\ui.yml'}
   - !task: {path: 'tasks\software.yml'}
   - !task: {path: 'tasks\wallpaper.yml'}

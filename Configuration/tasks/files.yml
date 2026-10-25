@@ -36,18 +36,23 @@ actions:
     path: "\\Microsoft\\Windows\\Maps\\MapsUpdateTask"
     operation: delete
   - !scheduledTask:
+    option: "manual-updates"
     path: "\\Microsoft\\Windows\\UpdateOrchestrator\\Schedule Scan"
     operation: delete
   - !scheduledTask:
+    option: "manual-updates"
     path: "\\Microsoft\\Windows\\UpdateOrchestrator\\Schedule Scan Static Task"
     operation: delete
   - !scheduledTask:
+    option: "manual-updates"
     path: "\\Microsoft\\Windows\\UpdateOrchestrator\\UpdateModelTask"
     operation: delete
   - !scheduledTask:
+    option: "manual-updates"
     path: "\\Microsoft\\Windows\\UpdateOrchestrator\\USO_UxBroker"
     operation: delete
   - !scheduledTask:
+    option: "manual-updates"
     path: "\\Microsoft\\Windows\\WindowsUpdate\\Scheduled Start"
     operation: delete
 

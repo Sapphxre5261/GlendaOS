@@ -7,7 +7,6 @@ actions:
   - !taskKill: {name: "msedge"}
   - !taskKill: {name: "MicrosoftEdge*"}
   - !taskKill: {name: "setup", pathContains: "\\Edge"}
-  - !taskKill: {name: "msedgewebview2"}
   - !service: {name: "edgeupdate", operation: delete}
   - !service: {name: "edgeupdatem", operation: delete}
   - !service: {name: "MicrosoftEdgeElevationService", operation: delete}
@@ -69,9 +68,6 @@ actions:
   - !registryKey: {path: 'HKLM\SOFTWARE\Microsoft\MediaPlayer\ShimInclusionList\msedge.exe'}
   - !registryKey: {path: 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge Update'}
 
-    # WebView
-  - !registryKey: {path: 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft EdgeWebView'}
-
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run', value: 'Microsoft Edge Update', operation: delete}
   - !registryValue: {path: 'HKCU\SOFTWARE\RegisteredApplications', value: 'Microsoft Edge', operation: delete}
   - !registryValue: {path: 'HKCU\SOFTWARE\Classes\.htm\OpenWithProgids', value: 'MSEdgeHTM', operation: delete}
@@ -107,10 +103,6 @@ actions:
   - !file: {path: "%ProgramFiles(x86)%\\Microsoft\\Edge", weight: 10}
   - !file: {path: "%ProgramFiles(x86)%\\Microsoft\\EdgeUpdate", weight: 10}
   - !file: {path: "%ProgramFiles(x86)%\\Microsoft\\EdgeCore", weight: 10}
-
-    # WebView
-  - !registryKey: {path: 'HKCU\SOFTWARE\Microsoft\EdgeWebView'}
-  - !file: {path: "%ProgramFiles(x86)%\\Microsoft\\EdgeWebView", weight: 10}
 
     # ---------- OneDrive
   - !status: {status: 'Removing OneDrive'}

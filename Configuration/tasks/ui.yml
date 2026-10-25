@@ -18,5 +18,19 @@ actions:
     exeDir: true
     exe: "CLEANUP.bat"
     weight: 30
-    
+
+  - !run:
+    exeDir: true
+    exe: "WINDOWSUPDATE.bat"
+    option: "manual-updates"
+    weight: 30
+
+    # ACL-protected policy keys (Dsh, Windows Feeds)
+  - !run:
+    exeDir: true
+    exe: "PROTECTED.bat"
+    args: "-Policies"
+    wait: true
+    weight: 30
+
   - !run: {exe: "explorer.exe", wait: false, runas: currentUser}

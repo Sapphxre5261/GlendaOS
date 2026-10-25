@@ -6,3 +6,9 @@ actions:
     name: "DiagTrack"
     operation: delete
 
+    # Disable Delivery Optimization (P2P update sharing)
+  - !service:
+    name: "DoSvc"
+    operation: change
+    startup: 4
+

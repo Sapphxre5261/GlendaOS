@@ -8,6 +8,13 @@ for /f "usebackq tokens=2 delims=\" %%A in (`reg query "HKEY_USERS" ^| findstr /
 			:: Clear W11 start menu pinned items, necessary on newer Windows versions.
 			reg delete "HKU\%%A\SOFTWARE\Microsoft\Windows\CurrentVersion\Start" /v "Config" /f
 
+			:: Clear taskbar pins - removed APPX apps leave dead icons behind
+			reg delete "HKU\%%A\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /v "Favorites" /f
+			reg delete "HKU\%%A\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /v "FavoritesResolve" /f
+
+			:: Hide Widgets taskbar button (HKCU write is denied when applied directly)
+			reg add "HKU\%%A\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f
+
 			for /f "usebackq tokens=3* delims= " %%B in (`reg query "HKU\%%A\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Local AppData" 2^>^&1 ^| findstr /R /X /C:".*Local AppData[ ]*REG_SZ[ ].*"`) do (
 				:: Clear W11 start menu pinned items
 				for /f "usebackq delims=" %%D in (`dir /b "%%C\Packages" /a:d ^| findstr /c:"Microsoft.Windows.StartMenuExperienceHost"`) do (
@@ -20,13 +27,13 @@ for /f "usebackq tokens=2 delims=\" %%A in (`reg query "HKEY_USERS" ^| findstr /
 				rmdir /q /s "%%C\Microsoft\Windows\Notifications"
 			)
 
-			for /f "usebackq tokens=2* delims= " %%B in (`reg query "HKU\%~1\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "AppData" 2^>^&1 ^| findstr /R /X /C:".*AppData[ ]*REG_SZ[ ].*"`) do (
+			for /f "usebackq tokens=2* delims= " %%B in (`reg query "HKU\%%A\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "AppData" 2^>^&1 ^| findstr /R /X /C:".*AppData[ ]*REG_SZ[ ].*"`) do (
 				echo del "%%C\Microsoft\Windows\Start Menu\Programs\Accessories\Internet Explorer.lnk" /q /f
 				del "%%C\Microsoft\Windows\Start Menu\Programs\Accessories\Internet Explorer.lnk" /q /f
 				echo del "%%C\Microsoft\Internet Explorer\Quick Launch\Microsoft Edge.lnk" /q /f
 				del "%%C\Microsoft\Internet Explorer\Quick Launch\Microsoft Edge.lnk" /q /f
-				echo del "%%C\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Microsoft Edge.lnk" /q /f
-				del "%%C\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Microsoft Edge.lnk" /q /f
+				echo del "%%C\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*.lnk" /q /f
+				del "%%C\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*.lnk" /q /f
 			)
 		)
 )
