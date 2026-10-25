@@ -35,20 +35,39 @@ $adminSid  = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-5
 $systemSid = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-18'
 
 function Grant-RegKey([string]$Path) {
+    # 1) Try writing the DACL directly - SeRestorePrivilege grants implicit
+    #    WRITE_DAC so an ownership change may not be needed at all
+    $acl = Get-Acl $Path
+    $rule = New-Object System.Security.AccessControl.RegistryAccessRule($systemSid, 'FullControl', 'ContainerInherit', 'None', 'Allow')
+    $acl.SetAccessRule($rule)
+    try {
+        Set-Acl -Path $Path -AclObject $acl -ErrorAction Stop
+        return
+    } catch {}
+
+    # 2) Fall back to taking ownership first, then grant SYSTEM full control
     $acl = Get-Acl $Path
     $acl.SetOwner($adminSid)
     Set-Acl -Path $Path -AclObject $acl -ErrorAction Stop
     $acl = Get-Acl $Path
-    $rule = New-Object System.Security.AccessControl.RegistryAccessRule($systemSid, 'FullControl', 'ContainerInherit', 'None', 'Allow')
     $acl.SetAccessRule($rule)
     Set-Acl -Path $Path -AclObject $acl -ErrorAction Stop
 }
 
 # Defender services - SCM-based changes are denied, write Start=4 directly
+# Original keys are exported to %ProgramData%\GlendaOS\Backups so a future
+# re-enable tool can restore them with a plain "reg import"
 if ($Services) {
+    $backupDir = "$env:ProgramData\GlendaOS\Backups"
+    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+
+    # Keep the re-enable script on the deployed machine for a future toggle tool
+    Copy-Item -Path "$PSScriptRoot\ENABLE-DEFENDER.bat" -Destination "$env:ProgramData\GlendaOS\" -Force -ErrorAction SilentlyContinue
+
     foreach ($s in 'WinDefend','WdNisSvc','Sense','SecurityHealthService','WdNisDrv','WdFilter','WdBoot') {
         $k = "HKLM:\SYSTEM\CurrentControlSet\Services\$s"
         if (!(Test-Path $k)) { Write-Host "$s : not present, skipping"; continue }
+        & reg.exe export "HKLM\SYSTEM\CurrentControlSet\Services\$s" "$backupDir\service-$s.reg" /y | Out-Null
         try {
             Grant-RegKey $k
             Set-ItemProperty -Path $k -Name 'Start' -Value 4 -Type DWord -ErrorAction Stop

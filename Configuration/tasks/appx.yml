@@ -3,7 +3,8 @@ description: Removal of certain Windows apps
 actions:
   - !status: {status: 'Removing APPX packages'}
   - !appx: {name: '*3DViewer*', type: family}
-  - !appx: {name: '*Apprep.Chx*', type: family}
+    # Keep Apprep.ChxApp - it renders the Windows Security UI; removing it
+    # leaves SecHealthUI showing a blank/black window
   - !appx: {name: '*AssignedAccessLockApp*', type: family}
   - !appx: {name: '*Bing*', type: family}
   - !appx: {name: '*CamoStudio*', type: family}
