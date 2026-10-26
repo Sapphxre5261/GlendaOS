@@ -1,0 +1,11 @@
+title: Software
+description: Installs software
+actions:
+  - !status: {status: 'Installing Brave Browser'}
+  - !software:
+    name: "brave"
+    source: chocolatey
+
+    # Warm up Brave - pre-creates profile and first-run caches so the
+    # first user launch is fast
+  - !run: {exeDir: true, exe: "WARMUP-BRAVE.bat", runas: currentUser, wait: false}

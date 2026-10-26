@@ -1,9 +1,0 @@
----
-title: Pause Windows Update by GlendaOS
-description: Pauses Windows Update for 10 years (reversible via Settings)
-actions:
-  - !writeStatus: {status: 'Pausing Windows Update for 10 years ...'}
-  - !run: 
-      exe: 'disable-update.bat'
-      exeDir: true
-      wait: true

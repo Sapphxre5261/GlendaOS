@@ -1,6 +1,4 @@
 @echo off
-:: Adapted from AME community playbook scripts / AtlasOS, modified 2026-10
-:: Original work licensed under GPL-3.0: https://github.com/Atlas-OS/Atlas
 
 for /f "usebackq tokens=2 delims=\" %%e in (`reg query "HKEY_USERS" ^| findstr /r /x /c:"HKEY_USERS\\S-.*" /c:"HKEY_USERS\\AME_UserHive_[^_]*"`) do (
 	REM If the "Volatile Environment" key exists, that means it is a proper user. Built in accounts/SIDs do not have this key.

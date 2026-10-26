@@ -7,8 +7,8 @@ actions:
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent', value: 'DisableCloudOptimizedContent', type: REG_DWORD, data: '1'}
 
     # Remove SecurityHealth from startup
-  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run', value: 'SecurityHealth', operation: delete}
-  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run', value: 'SecurityHealth', operation: delete}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run', value: 'SecurityHealth', operation: delete}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run', value: 'SecurityHealth', operation: delete}
 
     # Turns off Windows blocking installation of files downloaded from the internet
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments', value: 'SaveZoneInformation', type: REG_DWORD, data: '1'}
@@ -21,10 +21,28 @@ actions:
   - !registryKey: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata', operation: add}
 
     # New Control Panel cleanup - List of commands: https://winaero.com/ms-settings-commands-in-windows-10/
-  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer', value: 'SettingsPageVisibility', type: REG_SZ, data: 'hide:backup;delivery-optimization;findmydevice;developers;launchsecuritykeyenrollment;workplace-provisioning;workplace-repairtoken;provisioning;windowsanywhere;regionlanguage-adddisplaylanguage;regionlanguage-languageoptions;regionlanguage-setdisplaylanguage;speech;storagerecommendations;surfacehub-accounts;search;search-moredetails;search-permissions;mobile-devices;personalization-start-places;gaming-gamebar;gaming-gamedvr;family-group;cortana-moredetails;cortana-permissions;cortana-windowssearch;cortana;cortana-language;cortana-talktocortana;controlcenter;maps;maps-downloadmaps;videoplayback;appsforwebsites;optionalfeatures;workplace;assignedaccess;sync;backup;signinoptions-launchfaceenrollment;signinoptions-launchfingerprintenrollment;privacy-accessoryapps;privacy-accountinfo;privacy-activityhistory;privacy-advertisingid;privacy-appdiagnostics;privacy-automaticfiledownloads;privacy-backgroundapps;privacy-backgroundspatialperception;privacy-calendar;privacy-callhistory;privacy-webcam;privacy-contacts;privacy-documents;privacy-downloadsfolder;privacy-email;privacy-eyetracker;privacy-feedback;privacy-broadfilesystemaccess;privacy-general;privacy-graphicscaptureprogrammatic;privacy-graphicscapturewithoutborder;privacy-speechtyping;privacy-location;privacy-messaging;privacy-microphone;privacy-motion;privacy-musiclibrary;privacy-notifications;privacy-customdevices;privacy-phonecalls;privacy-pictures;privacy-radios;privacy-speech;privacy-tasks;privacy-videos;privacy-voiceactivation;account;crossdevice;project;camera;deviceusage;home;quiethours'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer', value: 'SettingsPageVisibility', type: REG_SZ, data: 'hide:activation;backup;delivery-optimization;findmydevice;developers;launchsecuritykeyenrollment;recovery;troubleshoot;windowsinsider;windowsinsider-optin;workplace-provisioning;workplace-repairtoken;provisioning;windowsanywhere;regionlanguage-adddisplaylanguage;regionlanguage-languageoptions;regionlanguage-setdisplaylanguage;speech;storagerecommendations;surfacehub-accounts;search;search-moredetails;search-permissions;mobile-devices;personalization-start-places;gaming-gamebar;gaming-gamedvr;gaming-gamemode;family-group;cortana-moredetails;cortana-permissions;cortana-windowssearch;cortana;cortana-language;cortana-talktocortana;controlcenter;maps;maps-downloadmaps;videoplayback;appsforwebsites;optionalfeatures;workplace;emailandaccounts;otherusers;assignedaccess;signinoptions;signinoptions-dynamiclock;sync;backup;signinoptions-launchfaceenrollment;signinoptions-launchfingerprintenrollment;yourinfo;privacy-accessoryapps;privacy-accountinfo;privacy-activityhistory;privacy-advertisingid;privacy-appdiagnostics;privacy-automaticfiledownloads;privacy-backgroundapps;privacy-backgroundspatialperception;privacy-calendar;privacy-callhistory;privacy-webcam;privacy-contacts;privacy-documents;privacy-downloadsfolder;privacy-email;privacy-eyetracker;privacy-feedback;privacy-broadfilesystemaccess;privacy-general;privacy-graphicscaptureprogrammatic;privacy-graphicscapturewithoutborder;privacy-speechtyping;privacy-location;privacy-messaging;privacy-microphone;privacy-motion;privacy-musiclibrary;privacy-notifications;privacy-customdevices;privacy-phonecalls;privacy-pictures;privacy-radios;privacy-speech;privacy-tasks;privacy-videos;privacy-voiceactivation;account;crossdevice;project;camera;deviceusage;home;quiethours'}
 
     # Disable Windows Error Reporting
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting', value: 'Disabled', type: REG_DWORD, data: '1'}
+
+    # Disable Delivery Optimization - HTTP direct downloads only, no P2P
+  - !registryKey: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization', operation: add}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization', value: 'DODownloadMode', type: REG_DWORD, data: '0'}
+
+    # Windows Update: notify only - user must download/install manually
+  - !registryKey: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU', operation: add, option: "manual-updates"}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU', value: 'AUOptions', type: REG_DWORD, data: '2'}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU', value: 'NoAutoUpdate', type: REG_DWORD, data: '1'}
+
+    # Pause updates until end of 2036 (shows "paused" in Settings > Windows Update)
+  - !registryKey: {path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', operation: add, option: "manual-updates"}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', value: 'FlightSettingsMaxPauseDays', type: REG_DWORD, data: '5000'}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', value: 'PauseFeatureUpdatesStartTime', type: REG_SZ, data: '2026-01-01T00:00:00Z'}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', value: 'PauseFeatureUpdatesEndTime', type: REG_SZ, data: '2036-12-31T00:00:00Z'}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', value: 'PauseQualityUpdatesStartTime', type: REG_SZ, data: '2026-01-01T00:00:00Z'}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', value: 'PauseQualityUpdatesEndTime', type: REG_SZ, data: '2036-12-31T00:00:00Z'}
+  - !registryValue: {option: "manual-updates", path: 'HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings', value: 'PauseUpdatesExpiryTime', type: REG_SZ, data: '2036-12-31T00:00:00Z'}
 
     # Search
   - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search', value: 'DisableWebSearch', type: REG_DWORD, data: '1'}
@@ -90,8 +108,9 @@ actions:
 
     # Disable News and Interests
   - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests', value: 'AllowNewsAndInterests', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Dsh', value: 'AllowNewsAndInterests', type: REG_DWORD, data: '0'}
-  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds', value: 'EnableFeeds', type: REG_DWORD, data: '0'}
+    # Note: 'HKLM\SOFTWARE\Policies\Microsoft\Dsh' AllowNewsAndInterests and
+    # 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds' EnableFeeds are
+    # ACL-protected on newer builds - handled by PROTECTED.ps1 -Policies instead
 
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo', value: 'Enabled', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost', value: 'EnableWebContentEvaluation', type: REG_DWORD, data: '0'}
@@ -117,9 +136,13 @@ actions:
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'Start_IrisRecommendations', type: REG_DWORD, data: '0'}
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'Start_AccountNotifications', type: REG_DWORD, data: '0'}
   - !registryValue: {option: "ui", path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'TaskbarGlomLevel', type: REG_DWORD, data: '2'}
-  - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'TaskbarDa', type: REG_DWORD, data: '0'}
+    # Note: TaskbarDa is set per-hive in CLEANUP.bat instead (HKCU write was denied)
   - !registryValue: {option: "ui", path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'TaskbarAl', type: REG_DWORD, data: '0'}
   - !registryValue: {option: "ui", path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'NavPaneShowAllFolders', type: REG_DWORD, data: '0'}
+
+    # Restore Windows 10 right-click context menu
+  - !registryKey: {path: 'HKCU\SOFTWARE\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32', operation: add, option: "win10-menu"}
+  - !registryValue: {option: "win10-menu", path: 'HKCU\SOFTWARE\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32', value: '(Default)', type: REG_SZ, data: ''}
 
     # Taskbar
   - !registryValue: {path: 'HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced', value: 'ShowCortanaButton', type: REG_DWORD, data: '0'}

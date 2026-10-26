@@ -1,10 +1,39 @@
-title: Disable Defender By GlendaOS
+title: Defender
 description: Disables Windows Defender
 actions:
-  - !writeStatus: {status: 'Disable Windows Defender ...', option: 'disable-defender'}
-  - !run: 
-      exe: 'disable-defender.bat'
-      exeDir: true
-      wait: true
-      option: 'disable-defender'
+  - !status: {status: 'Disabling Windows Defender', option: "defender"}
 
+    # Policies
+  - !registryKey: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender', operation: add, option: "defender"}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender', value: 'DisableAntiSpyware', type: REG_DWORD, data: '1'}
+  - !registryKey: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection', operation: add, option: "defender"}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection', value: 'DisableRealtimeMonitoring', type: REG_DWORD, data: '1'}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection', value: 'DisableBehaviorMonitoring', type: REG_DWORD, data: '1'}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection', value: 'DisableOnAccessProtection', type: REG_DWORD, data: '1'}
+  - !registryValue: {option: "defender", path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection', value: 'DisableScanOnRealtimeEnable', type: REG_DWORD, data: '1'}
+
+    # Services - disabled via registry takeown (!service goes through SCM, which
+    # Defender's service SDDL denies; PROTECTED.ps1 takes ownership and writes Start=4)
+  - !run:
+    exeDir: true
+    exe: "PROTECTED.bat"
+    args: "-Services"
+    option: "defender"
+    wait: true
+    weight: 30
+
+    # Scheduled tasks - disabled, not removed
+  - !scheduledTask: {path: '\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance', operation: disable, option: "defender"}
+  - !scheduledTask: {path: '\Microsoft\Windows\Windows Defender\Windows Defender Cleanup', operation: disable, option: "defender"}
+  - !scheduledTask: {path: '\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan', operation: disable, option: "defender"}
+  - !scheduledTask: {path: '\Microsoft\Windows\Windows Defender\Windows Defender Verification', operation: disable, option: "defender"}
+
+    # To RE-ENABLE Defender later (e.g. a future toggle tool):
+    #   1. reg import %ProgramData%\GlendaOS\Backups\service-*.reg (original Start values),
+    #      then delete the 'AutorunsDisabled' value on each service (absent by default).
+    #      WinDefend/WdNisSvc/WdNisDrv/WdFilter/WdBoot are ELAM-protected and were
+    #      left at defaults - no restore needed for them.
+    #   2. Delete HKLM\SOFTWARE\Policies\Microsoft\Windows Defender (the whole key).
+    #   3. Re-enable the 4 scheduled tasks above.
+    #   4. Re-add the tray icon: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+    #      'SecurityHealth' = "%windir%\system32\SecurityHealthSystray.exe"

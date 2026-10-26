@@ -24,6 +24,9 @@ actions:
     path: "\\Microsoft\\Windows\\Clip\\License Validation"
     operation: delete
   - !scheduledTask:
+    path: "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip"
+    operation: delete
+  - !scheduledTask:
     path: "\\Microsoft\\Windows\\HelloFace\\FODCleanupTask"
     operation: delete
   - !scheduledTask:
@@ -32,100 +35,26 @@ actions:
   - !scheduledTask:
     path: "\\Microsoft\\Windows\\Maps\\MapsUpdateTask"
     operation: delete
-  # UpdateOrchestrator/WindowsUpdate scheduled tasks kept - updates are paused (10y)
-  # not disabled, so Resume in Settings must still work
-
-    # Telemetry and diagnostics
   - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Application Experience\\PcaPatchDbTask"
+    option: "manual-updates"
+    path: "\\Microsoft\\Windows\\UpdateOrchestrator\\Schedule Scan"
     operation: delete
   - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Application Experience\\PcaWallpaperAppDetect"
+    option: "manual-updates"
+    path: "\\Microsoft\\Windows\\UpdateOrchestrator\\Schedule Scan Static Task"
     operation: delete
   - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Autochk\\Proxy"
+    option: "manual-updates"
+    path: "\\Microsoft\\Windows\\UpdateOrchestrator\\UpdateModelTask"
     operation: delete
   - !scheduledTask:
-    path: "\\Microsoft\\Windows\\DiskDiagnostic\\Microsoft-Windows-DiskDiagnosticDataCollector"
+    option: "manual-updates"
+    path: "\\Microsoft\\Windows\\UpdateOrchestrator\\USO_UxBroker"
     operation: delete
   - !scheduledTask:
-    path: "\\Microsoft\\Windows\\DiskDiagnostic\\Microsoft-Windows-DiskDiagnosticResolver"
+    option: "manual-updates"
+    path: "\\Microsoft\\Windows\\WindowsUpdate\\Scheduled Start"
     operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\DiskFootprint\\Diagnostics"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClient"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClientOnScenarioDownload"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\PI\\Sqm-Tasks"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Power Efficiency Diagnostics\\AnalyzeSystem"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Speech\\SpeechModelDownloadTask"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Windows Error Reporting\\QueueReporting"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Maintenance\\WinSAT"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\DUSM\\dusmtask"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Device Information\\Device"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Device Information\\Device User"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Shell\\FamilySafetyMonitor"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Shell\\FamilySafetyRefreshTask"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Diagnosis\\RecommendedTroubleshootingScanner"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Diagnosis\\Scheduled"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\RetailDemo\\CleanupOfflineContent"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\SharedPC\\Account Cleanup"
-    operation: delete
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\License Manager\\TempSignedLicenseExchange"
-    operation: delete
-
-  # Defender maintenance tasks - only when user chose to disable Defender
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Windows Defender\\Windows Defender Cache Maintenance"
-    operation: delete
-    option: 'disable-defender'
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Windows Defender\\Windows Defender Cleanup"
-    operation: delete
-    option: 'disable-defender'
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Windows Defender\\Windows Defender Scheduled Scan"
-    operation: delete
-    option: 'disable-defender'
-  - !scheduledTask:
-    path: "\\Microsoft\\Windows\\Windows Defender\\Windows Defender Verification"
-    operation: delete
-    option: 'disable-defender'
 
   - !status: {status: 'Removing files'}
   - !file:

@@ -1,0 +1,19 @@
+title: Bluetooth config
+description: Bluetooth config
+actions:
+  - !status: {status: 'Configuring bluetooth'}
+
+  - !service:
+      name: "BTAGService"
+      operation: change
+      startup: 4
+
+  - !service:
+      name: "bthserv"
+      operation: change
+      startup: 4
+
+  - !service:
+      name: "BluetoothUserService_51288"
+      operation: change
+      startup: 4
