@@ -64,7 +64,10 @@ if ($Services) {
     # Keep the re-enable script on the deployed machine for a future toggle tool
     Copy-Item -Path "$PSScriptRoot\ENABLE-DEFENDER.bat" -Destination "$env:ProgramData\GlendaOS\" -Force -ErrorAction SilentlyContinue
 
-    foreach ($s in 'WinDefend','WdNisSvc','Sense','SecurityHealthService','WdNisDrv','WdFilter','WdBoot') {
+    # Note: SecurityHealthService is intentionally kept enabled - it feeds the
+    # Windows Security app; disabling it leaves SecHealthUI showing a blank page.
+    # Sense is also kept - disabling it isn't needed for a clean debloat.
+    foreach ($s in 'WinDefend','WdNisSvc','WdNisDrv','WdFilter','WdBoot') {
         $k = "HKLM:\SYSTEM\CurrentControlSet\Services\$s"
         if (!(Test-Path $k)) { Write-Host "$s : not present, skipping"; continue }
         & reg.exe export "HKLM\SYSTEM\CurrentControlSet\Services\$s" "$backupDir\service-$s.reg" /y | Out-Null
